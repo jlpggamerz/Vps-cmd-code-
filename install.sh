@@ -9,9 +9,16 @@ set -euo pipefail
 display_header() {
     clear
     cat << "EOF"
+========================================================================
+      _ _      _____   _____   _____   _____   __  __  _____  _   _ 
+     | | |    |  __ \ / ____| |  __ \ / ____| |  \/  ||  __ \| \ | |
+     | | |    | |__) | |  __  | |  | | |  __  | \  / || |  | |  \| |
+ _   | | |    |  ___/| | |_ | | |  | | | |_ | | |\/| || |  | | . ` |
+| |__| | |____| |    | |__| | | |__| | |__| | | |  | || |__| | |\  |
+ \____/|______|_|     \_____| |_____/ \_____| |_|  |_||_____/|_| \_|
 
-========= JLPGGAMING VM MANAGER ========
-
+                    POWERED BY JLPGGAMING
+========================================================================
 EOF
     echo
 }
@@ -591,4 +598,83 @@ edit_vm_config() {
                     ;;
                 9)
                     while true; do
-                        read -p "$(print_status "INPUT" "Enter n
+                        read -p "$(print_status "INPUT" "Enter n                        new_username="${new_username:-$USERNAME}"
+                        if validate_input "username" "$new_username"; then
+                            USERNAME="$new_username"
+                            break
+                        fi
+                    done
+                    ;;
+                3)
+                    while true; do
+                        read -s -p "$(print_status "INPUT" "Enter new password (current: ****): ")" new_password
+                        new_password="${new_password:-$PASSWORD}"
+                        echo
+                        if [ -n "$new_password" ]; then
+                            PASSWORD="$new_password"
+                            break
+                        else
+                            print_status "ERROR" "Password cannot be empty"
+                        fi
+                    done
+                    ;;
+                4)
+                    while true; do
+                        read -p "$(print_status "INPUT" "Enter new SSH port (current: $SSH_PORT): ")" new_ssh_port
+                        new_ssh_port="${new_ssh_port:-$SSH_PORT}"
+                        if validate_input "port" "$new_ssh_port"; then
+                            # Check if port is already in use
+                            if [ "$new_ssh_port" != "$SSH_PORT" ] && ss -tln 2>/dev/null | grep -q ":$new_ssh_port "; then
+                                print_status "ERROR" "Port $new_ssh_port is already in use"
+                            else
+                                SSH_PORT="$new_ssh_port"
+                                break
+                            fi
+                        fi
+                    done
+                    ;;
+                5)
+                    while true; do
+                        read -p "$(print_status "INPUT" "Enable GUI mode? (y/n, current: $GUI_MODE): ")" gui_input
+                        gui_input="${gui_input:-}"
+                        if [[ "$gui_input" =~ ^[Yy]$ ]]; then 
+                            GUI_MODE=true
+                            break
+                        elif [[ "$gui_input" =~ ^[Nn]$ ]]; then
+                            GUI_MODE=false
+                            break
+                        elif [ -z "$gui_input" ]; then
+                            # Keep current value if user just pressed Enter
+                            break
+                        else
+                            print_status "ERROR" "Please answer y or n"
+                        fi
+                    done
+                    ;;
+                6)
+                    read -p "$(print_status "INPUT" "Additional port forwards (current: ${PORT_FORWARDS:-None}): ")" new_port_forwards
+                    PORT_FORWARDS="${new_port_forwards:-$PORT_FORWARDS}"
+                    ;;
+                7)
+                    while true; do
+                        read -p "$(print_status "INPUT" "Enter new memory in MB (current: $MEMORY): ")" new_memory
+                        new_memory="${new_memory:-$MEMORY}"
+                        if validate_input "number" "$new_memory"; then
+                            MEMORY="$new_memory"
+                            break
+                        fi
+                    done
+                    ;;
+                8)
+                    while true; do
+                        read -p "$(print_status "INPUT" "Enter new CPU count (current: $CPUS): ")" new_cpus
+                        new_cpus="${new_cpus:-$CPUS}"
+                        if validate_input "number" "$new_cpus"; then
+                            CPUS="$new_cpus"
+                            break
+                        fi
+                    done
+                    ;;
+                9)
+                    while true; do
+                        read -p "$(print_status "INPUT" "Enter 
